@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Optimization</title>
+</head>
+<body>
+    <h1>Delivery Optimization</h1>
+    <label for="firm">Firm Location:</label>
+    <input type="text" id="firm" name="firm" value="Marsa, Tunis"><br><br>
+    <label for="locations">Locations to Deliver:</label>
+    <textarea id="locations" required>Manouba, Tunis
+Laouina, Tunis</textarea><br><br>
+    <button onclick="showDirections()">Show Directions</button>
+    <div id="map" style="width: 100%; height: 600px;"></div>
+
+    <script src="https://api.mqcdn.com/sdk/mapquest-js/v1.3.2/mapquest.js"></script>
+    <script>
+        function showDirections() {
+            var firmLocation = document.getElementById('firm').value;
+            var locationsToDeliver = document.getElementById('locations').value;
+
+            var mapquestKey = 'xxRZu1my4jvVfOfYO6NnFDbJo37lCzLk';
+            var mapWidth = 600;
+            var mapHeight = 600;
+
+            // Extracting individual locations from the textarea
+            var locationsArray = locationsToDeliver.split('\n');
+            var locationsQuery = locationsArray.map(location => {
+                return location.trim(); // Remove any leading/trailing whitespace
+            }).join(',');
+
+            var map = L.mapquest.map('map', {
+                center: [36.8796200, 10.2427390], // Centered at Marsa, Tunis
+                layers: L.mapquest.tileLayer('map'),
+                zoom: 12
+            });
+
+            // Adding custom markers to the map
+            L.mapquest.textMarker({
+                position: [36.8796200, 10.2427390],
+                text: 'Firm',
+                subtext: firmLocation,
+                icon: {
+                    primaryColor: '#FF0000',
+                    secondaryColor: '#FFFFFF',
+                    size: 'sm'
+                }
+            }).addTo(map);
+
+            var otherLocations = locationsQuery.split(',');
+            for (var i = 0; i < otherLocations.length; i++) {
+                L.mapquest.textMarker({
+                    position: [36.8796200, 10.2427390], // We'll update this later
+                    text: (i + 1).toString(), // Numbering the locations
+                    subtext: otherLocations[i],
+                    icon: {
+                        primaryColor: '#0000FF',
+                        secondaryColor: '#FFFFFF',
+                        size: 'sm'
+                    }
+                }).addTo(map);
+            }
+
+            // Geocode the other locations and update marker positions
+            var geocoder = L.mapquest.geocoding();
+            geocoder.geocode(locationsQuery, function (error, response) {
+                if (!error) {
+                    var results = response.results;
+                    for (var i = 0; i < results.length; i++) {
+                        var location = results[i].locations[0];
+                        var latLng = location.latLng;
+                        var textMarker = map.getLayers('textMarkers')[i + 1];
+                        textMarker.setLatLng(latLng);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

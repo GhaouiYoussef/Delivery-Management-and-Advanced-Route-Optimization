@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Optimization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        #header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1em 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2em;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5em;
+            font-weight: bold;
+        }
+        input[type="text"], textarea, input[type="number"] {
+            width: 100%;
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-bottom: 1em;
+        }
+        button {
+            background-color: #333;
+            color: #fff;
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 1em;
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #f4f4f4;
+        }
+        #map {
+            width: 100%;
+            height: 200px;
+            margin-top: 1em;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    </style>
+
+</head>
+<body>
+    <script src="front_end_flask_adapt.js"></script>
+    <h1>Delivery Optimization</h1>
+    <label for="firm">Point de Retrait:</label>
+    <input type="text" id="firm" name="firm"><br><br>
+    <label for="locations">Points de livraisons:</label>
+    <textarea id="locations" required></textarea><br><br>
+    <label for="num_vehicles">Nombre de Vehicles(Livreurs):</label>
+    <input type="number" id="num_vehicles" name="num_vehicles" min="1" max="5"><br><br>
+    <label for="num_vehicles">Durre a ne pas exceder :</label>
+    <input type="number" id="max_duration" name="max_duration" min="0"><br><br>
+    <button onclick="optimizeDelivery()">Optimizer La livraison</button>
+    <div id="result"></div>
+
+    
+</body>
+<script src="https://api.mqcdn.com/sdk/mapquest-js/v1.3.2/mapquest.js"></script>
+<div id="map" style="width: 100%; height: 200px;"></div>
+<script>
+    var latitude = 36.8796200; // Latitude of Marsa, Tunis
+    var longitude = 10.2427390; // Longitude of Marsa, Tunis
+
+    window.onload = function () {
+      L.mapquest.key = 'xxRZu1my4jvVfOfYO6NnFDbJo37lCzLk';
+      var map = L.mapquest.map('map', {
+        center: [latitude, longitude], // Replace latitude and longitude with the desired map center coordinates
+        layers: L.mapquest.tileLayer('map'),
+        zoom: 12 // Set the initial zoom level (1-18)
+      });
+    };
+
+
+    function showDirection() {
+        var firmLocation = document.getElementById('firm').value;
+        var locationsToDeliver = document.getElementById('locations').value;
+
+        var geocoder = L.mapquest.geocoding();
+        geocoder.geocode([firmLocation, 'Manouba, Tunis'].join(', '), function (error, response) {
+            if (!error) {
+                var startLatLng = response.results[0].locations[0].latLng;
+                var endLatLng = response.results[1].locations[0].latLng;
+
+                var directions = L.mapquest.directions();
+                directions.route({
+                    start: startLatLng,
+                    end: endLatLng,
+                    options: {
+                        maxRoutes: 1,
+                        routeResponseContainer: document.getElementById('result')
+                    }
+                });
+            }
+        });
+    }
+  </script>
+  <button onclick="showDirection()">Show Direction</button>
+  <label for="firm">Firm Location (Marsa, Tunis):</label>
+<input type="text" id="firm" name="firm" value="Marsa, Tunis"><br><br>
+
+<link rel="stylesheet" href="https://api.mqcdn.com/sdk/mapquest-js/v1.3.2/mapquest.css">
+  
+</html>
