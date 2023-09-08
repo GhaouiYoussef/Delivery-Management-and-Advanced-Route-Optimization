@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request , jsonify, make_response
-from delivery_optimization_web import optimize_delivery
+from Delivery_op_GM_distance_based import optimize_delivery
 from flask_cors import CORS
 
 '''    firm = request.form['firm']
@@ -25,11 +25,11 @@ def optimize():
         # Extract individual data elements
     firm = data['firm']
     locations = data['locations']
-    num_vehicles = int(data['num_vehicles'])
+    num_vehicules = int(data['num_vehicules'])
     max_duration = int(data['max_duration'])
     print(firm)
     # Run the delivery optimization algorithm
-    optimized_routes = optimize_delivery(firm=firm, locations=locations, num_vehicules=num_vehicles,max_duration=max_duration)
+    optimized_routes = optimize_delivery(firm=firm, locations=locations, num_vehicules=num_vehicules,max_duration=max_duration)
     print(optimized_routes)
     # Return the results as a JSON response
     # Replace \n with newline escape sequences \\n
